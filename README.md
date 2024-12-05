@@ -9,6 +9,7 @@ First create a virtual environment, then:
 ```
 git clone https://github.com/Rousseau-Team/lysin-target-pred.git
 git clone https://github.com/Rousseau-Team/sublyme.git
+tar -zxvf lysin-target-pred/data/phalp_annotated_embeddings.csv.tar.gz -C lysin-target-pred/data/
 
 pip install numpy pandas transformers sklearn
 ```
