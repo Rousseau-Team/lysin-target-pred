@@ -23,9 +23,11 @@ pip install numpy pandas transformers sklearn
 
 ## Usage
 To train the lysin-target prediction models:
-`python lysin-target-pred/bin/train_target.py training_database.csv --host Enterococcus --size_neg 500 --lysin_type all --mode 1 --iterations 200`
+```python lysin-target-pred/bin/train_target.py training_database.csv --host Enterococcus --size_neg 500 --lysin_type all --mode 1 --iterations 200```
+
 For more information: `python lysin-target-pred/bin/train_target.py -h`
 
 To launch prediction pipeline:
-`python lysin-target-pred/bin/pipeline.py seqs.faa --sublyme_models sublyme/models --target_models models_Enterococcus -o ./outputs --calc_embeddings --pred_lysins --pred_target`
+```python lysin-target-pred/bin/pipeline.py seqs.faa --sublyme_models sublyme/models --target_models models_Enterococcus -o ./outputs --calc_embeddings --pred_lysins --pred_target```
+
 For more information: `python lysin-target-pred/bin/pipeline.py -h`
