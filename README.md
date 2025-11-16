@@ -36,8 +36,10 @@ Know that there is some advantage to having a higher number of negative examples
 
 The final prediction is a consensus made from the predictions of all models. A lysin predicted by 90% of models as being associated to your host, very likely ressembles other proteins in PhaLP that are associated to your host. That being said even if a lower % of models indicate this association, there is still a good likelyhood that your lysin ressembles those in the training dataset that are associated to your host. You can decide what is acceptable to you based on the objectives of your experiment. I.e. Depending on if you are looking for very likely candidates or are you looking for many potential candidates.
 
-**To train your lysin-target prediction model:**\
-```python lysin-target-pred/bin/train_target.py training_database.csv --host Enterococcus --size_neg 500 --lysin_type all --mode 1 --iterations 200 --output_folder target_models```
+**To train your lysin-target prediction model:**
+```
+python bin/train_target.py data/phalp_annotated_embeddings.csv --host Enterococcus --size_neg 500 --lysin_type all --mode 1 --iterations 200 --output_folder target_models
+```
 
 **Description of parameters**
 - **--host**              - Your host of interest at the genus level (with first letter capitalized). Make sure your host is present in the dataset, spelled the same way, and has enough representatives (usually at least around 100 sequences, but a little less is probably acceptable). 
@@ -51,8 +53,10 @@ The final prediction is a consensus made from the predictions of all models. A l
 ### Part 2: Launch the prediction pipeline
 Using your set of proteins (a fasta or multifasta of protein sequences obtained for example from a metagenomic assembly), first predict which proteins are lysins using SUBLYME, then predict which lysins are associated to your host. These steps are all taken care of by launching the following script.
 
-**To launch prediction pipeline:**\
-```python lysin-target-pred/bin/pipeline.py seqs.faa --sublyme_models sublyme/models --target_models models_Enterococcus -o ./outputs --calc_embeddings --pred_lysins --pred_target```
+**To launch prediction pipeline:**
+```
+python bin/pipeline.py test/input.faa --target_models target_models/models_Enterococcus -o output_preds --calc_embeddings --pred_lysins --pred_target
+```
 
 You can specify any combination of --calc_embeddings, --pred_lysins and --pred_target (at least one of these must be specified). The usual pipeline is to launch all 3 steps, starting with a fasta file of protein sequences.
 
@@ -80,4 +84,16 @@ For each model trained:
 Later, all trained models with precision >80% are used to make predictions and a consensus is taken.
 
 ## Output format
+The output corresponds to the consensus of predictions made by all target-prediction models.
 
+Ex. Predictions made for host X.
+|      | 90% | 80% | 70% | 60% | 50% | 40% | 30% | 20% | 10% |
+|------|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+|Prot 1|True |True |True |True |True |True |True | True|True |
+|Prot 2|False|False|False|False|True |True |True |True | True|
+|Prot 3|False|False|False|False|False|False|False|False|False|
+
+How to interpret:
+Prot 1 has been predicted by more than 90% of models as being associated to host X. It very probably ressembles lysins associated to host X in the training set.
+Prot 2 has been predicted by more than 50% of models as being associated to host X. It still ressembles the lysins associated to host X in the training set, but be more critical when making decisions/conclusions.
+Prot 3 was predicted by less than 10% of models as being associated to host X. It is unlikely that it is associated to host X (although still possible, the models may be conservative and the training database too limited).
