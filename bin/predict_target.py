@@ -55,7 +55,7 @@ def main(embs_path, models_folder, output_folder):
 
     # Save final results to path
     name = os.path.basename(embs_path).split(".")[0]
-    final_res.to_csv(os.path.join(output_folder, f"{name}_target_preds.csv"))
+    final_res.to_csv(os.path.join(output_folder, "target_preds.csv"))
 
 if __name__=='__main__':
     embs_path, models_folder, output_folder = parse_args()

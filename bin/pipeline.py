@@ -71,7 +71,7 @@ if __name__ == '__main__':
     # keep embs only for predicted lysins
     if (pred_lysins == True):
         embs = pd.read_csv(embs_path, index_col=0)
-        lysins = pd.read_csv(os.path.join(output_folder, f"predictions_sublyme.csv"), index_col=0)
+        lysins = pd.read_csv(os.path.join(output_folder, f"sublyme_predictions.csv"), index_col=0)
         embs = embs.loc[lysins.lysin > 0.5]
         embs.to_csv(os.path.join(output_folder, "lysin_embs.csv"))
         embs_path = os.path.join(output_folder, "lysin_embs.csv")
