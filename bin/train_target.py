@@ -3,8 +3,8 @@ import json
 import joblib
 import argparse
 import pandas as pd
-import numpy as np
 import seaborn as sns
+import numpy as np
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 from sklearn.model_selection import StratifiedKFold
@@ -16,7 +16,7 @@ def parse_args():
     parser.add_argument('training_database', help='Path to training database (PHALP embeddings + annotations).')
     parser.add_argument('-o', '--output_folder', help='Path to the output folder [./outputs].', default="./outputs")
     parser.add_argument('--host', help='Bacterial host genus of interest [Enterococcus].', default="Enterococcus")
-    parser.add_argument('--size_neg', help='Number of negative proteins considered per split [500].', default=500)
+    parser.add_argument('--size_neg', type=int, help='Number of negative proteins considered per split [500].', default=500)
     parser.add_argument('--lysin_type', help='Type of lysin used to train models. ([all], endolysin or val)', default="all")
     parser.add_argument('--mode', type=int, help='Whether to favour precision (0) or recall (1) [1]. Mode 0 should only be used to limit as much as possible false positives, but will have a big impact on recall.', default=1)
     parser.add_argument('--iterations', type=int, help='Number of models to train. Should be enough to cover whole negative dataset.', default=200)
