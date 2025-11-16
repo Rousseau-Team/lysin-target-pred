@@ -93,7 +93,7 @@ Ex. Predictions made for host X.
 |Prot 2|False|False|False|False|True |True |True |True | True|
 |Prot 3|False|False|False|False|False|False|False|False|False|
 
-How to interpret:
-Prot 1 has been predicted by more than 90% of models as being associated to host X. It very probably ressembles lysins associated to host X in the training set.
-Prot 2 has been predicted by more than 50% of models as being associated to host X. It still ressembles the lysins associated to host X in the training set, but be more critical when making decisions/conclusions.
+How to interpret:\
+Prot 1 has been predicted by more than 90% of models as being associated to host X. It very probably ressembles lysins associated to host X in the training set.\
+Prot 2 has been predicted by more than 50% of models as being associated to host X. It still ressembles the lysins associated to host X in the training set, but be more critical when making decisions/conclusions.\
 Prot 3 was predicted by less than 10% of models as being associated to host X. It is unlikely that it is associated to host X (although still possible, the models may be conservative and the training database too limited).
