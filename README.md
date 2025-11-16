@@ -32,11 +32,11 @@ have seen the whole negative dataset during training. We recommend setting the *
 Know that there is some advantage to having a higher number of negative examples than positive ones as the negative class is expected to be much more diverse than the positive one.
 
 - **--size_neg** is chosen as a function of the number of entries associated to your host of interest (1-3x the number of positive entries).
-- **--iterations** is chosen as a function of the number of entries associated to other hosts (negative entries) divided by **--size_neg**. The number of iterations should allow for the whole negative dataset to be seen at least once. Also know that only models with a precision > 80% on its test set are kept to make final predictions, meaning that you should increase the number of models you train to compensate for the models that are going to be thrown away.
+- **--iterations** corresponds to the number of models to train and is chosen as a function of the number of entries associated to other hosts (negative entries) divided by **--size_neg**. The number of models should allow for the whole negative dataset to be seen at least once. Also know that only models with a precision > 80% on its test set are kept to make final predictions, meaning that you should increase the number of models you train to compensate for the models that are going to be thrown away.
 
 The final prediction is a consensus made from the predictions of all models. A lysin predicted by 90% of models as being associated to your host, very likely ressembles other proteins in PhaLP that are associated to your host. That being said even if a lower % of models indicate this association, there is still a good likelyhood that your lysin ressembles those in the training dataset that are associated to your host. You can decide what is acceptable to you based on the objectives of your experiment. I.e. Depending on if you are looking for very likely candidates or are you looking for many potential candidates.
 
-**To train your lysin-target prediction model:**
+**To train your lysin-target prediction model:**\
 ```python lysin-target-pred/bin/train_target.py training_database.csv --host Enterococcus --size_neg 500 --lysin_type all --mode 1 --iterations 200 --output_folder target_models```
 
 **Description of parameters**
@@ -51,10 +51,10 @@ The final prediction is a consensus made from the predictions of all models. A l
 ### Part 2: Launch the prediction pipeline
 Using your set of proteins (a fasta or multifasta of protein sequences obtained for example from a metagenomic assembly), first predict which proteins are lysins using SUBLYME, then predict which lysins are associated to your host. These steps are all taken care of by launching the following script.
 
-**To launch prediction pipeline:**
+**To launch prediction pipeline:**\
 ```python lysin-target-pred/bin/pipeline.py seqs.faa --sublyme_models sublyme/models --target_models models_Enterococcus -o ./outputs --calc_embeddings --pred_lysins --pred_target```
 
-You can specify any combination of --calc_embeddings, --pred_lysins, and --pred_target (at least one of these must be specified). The usual pipeline is to launch all 3 steps, starting with a fasta file of protein sequences.
+You can specify any combination of --calc_embeddings, --pred_lysins and --pred_target (at least one of these must be specified). The usual pipeline is to launch all 3 steps, starting with a fasta file of protein sequences.
 
 If you have already run SUBLYME or Empathi, you may use the .csv file of protein embeddings as input rather than the protein sequences (fasta) to save a lot of time. If you do this, do not specify the --calc_embeddings option, but keep the --pred_lysins option. This will ensure the intermediate file is correctly formatted.
 
@@ -73,8 +73,8 @@ If you already have a file of lysin sequences for which it is unnecessary to lau
 ## Training and testing procedure
 For each model trained:
 - The whole set of positive proteins is considered (all proteins associated to your host of interest).
-- A # of negative proteins equivalent to --size_neg is considered (proteins associated to other hosts). As a rough guide, --size_neg should be around 1-3x the number of positive proteins in the dataset.
-- The dataset is split into a training (80% of clusters) and testing (20% of clusters) set using clusters at 30% seq identity, ensuring all similar proteins are found in the same subset.
+- A number of negative proteins equivalent to --size_neg is considered (proteins associated to other hosts). As a rough guide, --size_neg should be around 1-3x the number of positive proteins in the dataset.
+- The dataset is split into a training and testing set using clusters at 30% seq identity, ensuring all similar proteins are found in the same subset. 80% of clusters are used to train the model and the remaining 20% are used to test it.
 - A trained model is kept only if its precision on the test set is >80%.
 
 Later, all trained models with precision >80% are used to make predictions and a consensus is taken.
