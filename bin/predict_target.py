@@ -43,15 +43,15 @@ def main(embs_path, models_folder, output_folder):
         all_res[file] = preds
 
     # agglomerate predictions made by all models
-    final_res["entero_0.90"] = (all_res.sum(axis=1) > i*0.9)
-    final_res["entero_0.80"] = (all_res.sum(axis=1) > i*0.8)
-    final_res["entero_0.70"] = (all_res.sum(axis=1) > i*0.7)
-    final_res["entero_0.60"] = (all_res.sum(axis=1) > i*0.6)
-    final_res["entero_0.50"] = (all_res.sum(axis=1) > i*0.5)
-    final_res["entero_0.40"] = (all_res.sum(axis=1) > i*0.4)
-    final_res["entero_0.30"] = (all_res.sum(axis=1) > i*0.3)
-    final_res["entero_0.20"] = (all_res.sum(axis=1) > i*0.2)
-    final_res["entero_0.10"] = (all_res.sum(axis=1) > i*0.1)
+    final_res["0.90"] = (all_res.sum(axis=1) > i*0.9)
+    final_res["0.80"] = (all_res.sum(axis=1) > i*0.8)
+    final_res["0.70"] = (all_res.sum(axis=1) > i*0.7)
+    final_res["0.60"] = (all_res.sum(axis=1) > i*0.6)
+    final_res["0.50"] = (all_res.sum(axis=1) > i*0.5)
+    final_res["0.40"] = (all_res.sum(axis=1) > i*0.4)
+    final_res["0.30"] = (all_res.sum(axis=1) > i*0.3)
+    final_res["0.20"] = (all_res.sum(axis=1) > i*0.2)
+    final_res["0.10"] = (all_res.sum(axis=1) > i*0.1)
 
     # Save final results to path
     name = os.path.basename(embs_path).split(".")[0]
