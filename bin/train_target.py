@@ -79,10 +79,10 @@ def train_model(data, repeat):
     scores.loc[f"model_{repeat}","Precision"] = precision_score(preds["label"], preds["pred"])
     scores.loc[f"model_{repeat}","Recall"] = recall_score(preds["label"], preds["pred"])
 
-    host_counts = pd.merge(pd.DataFrame(train.host_genus.value_counts()), pd.DataFrame(test.host_genus.value_counts()), left_index=True, right_index=True, how='outer', suffixes=['_train', '_test']).fillna(0)
-    host_counts.columns = [f"model_{repeat}_train", f"model_{repeat}_test"]
+    #host_counts = pd.merge(pd.DataFrame(train.host_genus.value_counts()), pd.DataFrame(test.host_genus.value_counts()), left_index=True, right_index=True, how='outer', suffixes=['_train', '_test']).fillna(0)
+    #host_counts.columns = [f"model_{repeat}_train", f"model_{repeat}_test"]
 
-    return clf, scores, host_counts
+    return clf, scores #, host_counts
 
 
 def plot_scores(scores, filename):
@@ -105,40 +105,77 @@ def main(training_database, output_folder, host, size_neg, lysin_type, mode, ite
     if not os.path.exists(os.path.join(output_folder, f"models_{host}")):
        os.makedirs(os.path.join(output_folder, f"models_{host}"))
 
-    # training database: "data/phalp_annotated_embeddings.csv"
     data = load_data(training_database)
     if not (host in data.host_genus.unique()):
         raise Exception(f"{host} is not found in the database file. Make sure it is correctly spelled (capital on first letter) and corresponds to the genus of a bacterial host.")
 
     pos_pcs = data.loc[data.host_genus == host].pc.unique()
-    #if mode == 0:
-    #    N = data.loc[data.host_genus != host].shape[0]
-    #if mode == 1:
-    #    N = data.loc[~data.pc.isin(pos_pcs)].shape[0]
 
     all_scores = pd.DataFrame(columns=["F1-score", "Precision", "Recall"])
-    all_host_counts = pd.DataFrame()
 
     print("Starting to train models.")
     print(f"There are {data.loc[data.host_genus == host].shape[0]} proteins in the positive dataset corresponding to {len(pos_pcs)} clusters.")
-    #for repeat in range(N // size_neg):
     for repeat in range(iterations):
         train = sample_for_repeat(data, host, mode, lysin_type=lysin_type, size_neg=size_neg, repeat=repeat)
 
-        clf, scores, host_counts = train_model(train, repeat)
+        clf, scores = train_model(train, repeat)
 
         all_scores = pd.concat([all_scores, scores])
-        all_host_counts = pd.merge(all_host_counts, host_counts, left_index=True, right_index=True, how='outer').fillna(0)
 
         if scores.Precision.values[0] > 0.8:
             joblib.dump(clf, os.path.join(output_folder, f"models_{host}", f"clf_{host}_{repeat}.pkl"))
 
     plot_scores(all_scores, os.path.join(output_folder, "all_scores.png"))
-    all_host_counts.to_csv(os.path.join(output_folder, "all_host_counts.csv"))
 
+def sample_for_repeat_gram(data, lysin_type='all', repeat=0):
+    data["label"] = data.gram
+    if lysin_type != "all":
+        data = data.loc[(data.annotation == lysin_type)]
+
+    pos = data.loc[(data.gram == 1)].sample(frac=0.2, random_state=repeat)
+    neg = data.loc[(data.gram == 0)].sample(frac=0.2, random_state=repeat)
+
+    train = pd.concat([pos, neg])
+
+    return train
+
+
+def pred_gram(training_database, output_folder, host, size_neg, lysin_type, mode, iterations):
+
+    if not os.path.exists(training_database):
+        raise FileNotFoundError(f"{training_database} was not found. Please verify path.")
+    if not os.path.exists(output_folder):
+       os.makedirs(output_folder)
+    if not os.path.exists(os.path.join(output_folder, f"models_{host}")):
+       os.makedirs(os.path.join(output_folder, f"models_{host}"))
+
+    data = load_data(training_database)
+    gram = pd.read_csv(os.path.join(os.path.dirname(training_database), "host_gram.csv"), index_col="proteinID")
+    gram.index.name = None
+    data = pd.merge(data, gram, left_index=True, right_index=True)
+
+    all_scores = pd.DataFrame(columns=["F1-score", "Precision", "Recall"])
+
+
+    print("Starting to train models.")
+    print(f"There are {data.gram.value_counts()[1]} gram-pos proteins ({data.loc[data.gram == 1].pc.nunique()} clusters) and {data.gram.value_counts()[0]} gram-neg proteins ({data.loc[data.gram == 0].pc.nunique()} clusters) in the dataset.")
+    for repeat in range(iterations):
+        train = sample_for_repeat_gram(data, lysin_type=lysin_type, repeat=repeat)
+
+        clf, scores = train_model(train, repeat)
+
+        all_scores = pd.concat([all_scores, scores])
+
+        if scores.Precision.values[0] > 0.8:
+            joblib.dump(clf, os.path.join(output_folder, f"models_{host}", f"clf_{host}_{repeat}.pkl"))
+
+    plot_scores(all_scores, os.path.join(output_folder, "all_gram_scores.png"))
 
 
 if __name__=='__main__':
     training_database, output_folder, host, size_neg, lysin_type, mode, iterations = parse_args()
 
-    main(training_database, output_folder, host, size_neg, lysin_type, mode, iterations)
+    if host != "gram":
+        main(training_database, output_folder, host, size_neg, lysin_type, mode, iterations)
+    if host == "gram":
+        pred_gram(training_database, output_folder, host, size_neg, lysin_type, mode, iterations)

@@ -22,6 +22,7 @@ def parse_args():
     parser.add_argument('--calc_embeddings', help='Only embedding calculation will be performed unless pred_lysins and pred_target are specified as well. Make sure input file is specified.', action='store_true')
     parser.add_argument('--pred_lysins', help='Predict lysins. Only lysin prediction will be performed unless calc_embeddings and pred_target are specified as well. Make sure output files from previous step is in output_folder and specify sublyme_models folder.', action='store_true')
     parser.add_argument('--pred_target', help='Predict lysin target. Only lysin target prediction will be performed unless calc_embeddings and pred_lysin are specified as well. Make sure output files from previous steps are in output_folder and specify target_models.', action='store_true')
+    parser.add_argument('--pred_gram', help='Specify this option if you are predicting only the gram of the bacterial target.', action='store_true')
     args = parser.parse_args()
 
     input_file = args.input_file
@@ -30,19 +31,20 @@ def parse_args():
     calc_embeddings = args.calc_embeddings
     pred_lysins = args.pred_lysins
     pred_target = args.pred_target
+    pred_gram = args.pred_gram
 
-    return input_file, target_models, output_folder, calc_embeddings, pred_lysins, pred_target
+    return input_file, target_models, output_folder, calc_embeddings, pred_lysins, pred_target, pred_gram
 
 
 if __name__ == '__main__':
     #parse user arguments
-    input_file, target_models, output_folder, calc_embeddings, pred_lysins, pred_target = parse_args()
+    input_file, target_models, output_folder, calc_embeddings, pred_lysins, pred_target, pred_gram = parse_args()
 
     fname = f"{os.path.split(input_file)[1].rsplit('.', 1)[0]}.csv"
     embs_path = os.path.join(output_folder, fname)
 
-    if ((pred_lysins == False) & (pred_target == False) & (calc_embeddings == False)):
-        print("At least one of --calc_embeddings, --pred_lysins and/or --pred_target must be specified.")
+    if ((pred_lysins == False) & (pred_target == False) & (calc_embeddings == False) & (pred_gram == False)):
+        print("At least one of --calc_embeddings, --pred_lysins, --pred_target and/or pred_gram must be specified.")
         sys.exit(0)
 
     if (calc_embeddings == True) and not input_file.endswith((".fa", ".faa", ".fasta")):
@@ -82,3 +84,7 @@ if __name__ == '__main__':
     # Predict lysin targets
     if (pred_target == True):
         predict_target.main(embs_path, target_models, output_folder)
+
+    # Only predict gram of lysin targets
+    if (pred_gram == True):
+        predict_target.main_gram_pred(embs_path, target_models, output_folder)

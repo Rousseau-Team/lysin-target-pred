@@ -97,3 +97,35 @@ How to interpret:
 - Prot 1 has been predicted by more than 90% of models as being associated to host X. It very probably ressembles lysins associated to host X in the training set.
 - Prot 2 has been predicted by more than 50% of models as being associated to host X. It still ressembles the lysins associated to host X in the training set, but be more critical when taking decisions or drawing conclusions.
 - Prot 3 was predicted by less than 10% of models as being associated to host X. It is unlikely that it is associated to host X (although still possible, the models may be conservative and the training database too limited).
+
+## Host gram prediction
+An extra module was added if you simply wish to predict the gram of the bacteria your lysins are associated to.
+
+7852 gram-positive lysins (572 clusters) and 7535 gram-neg lysins (522 clusters) are present in the dataset. The dataset contains a large number of examples associated to both classes and is already pretty balanced, so we could envision training only one model. However, to keep the methodology the same as previously, 20% of the dataset is kept at each iteration. Among the retained lysins, a training set composed of 80% of the data and a testing set composed of the remaining 20% is created. These training and testing sets are separated on the basis of "30% sequence identity clusters" as described above.
+
+Like before, we train multiple models and take the consensus predictions made by all of them. The gram prediction task being much simpler, a lower number of iterations are needed to obtain confident results (most if not all models have a precision >>90%). Models remain fast to train, so feel free to train as many as you want (~100 is far more than sufficient).
+
+**To train your gram prediction model:**
+```
+python bin/train_target.py data/phalp_annotated_embeddings.csv --host gram --lysin_type all --iterations 100 --output_folder target_models
+```
+
+Note that the --host argument is now "gram".
+
+**To launch prediction pipeline:**
+```
+python bin/pipeline.py test/input.faa --target_models target_models/models_gram -o output_preds --pred_gram
+```
+
+Note that you must now specify --pred_gram (not --pred_target) to let the script know that models have been trained to predict the gram of the bacterial target.
+
+Remember to use the embeddings file as input (and to remove --calc_embeddings --pred_lysins) if these step have already been done.
+
+**Output format**
+The output corresponds to the consensus of predictions made by the model. The first column indicates the % of models that predict a lysin as being associated to a gram-positive host and the second indicates the % of models that predict a lysin as being associated to a gram-negative host.
+
+Ex. Predicted gram of each lysin
+|      |gram-pos %|gram-neg %|
+|Prot 1|    90%   |    10%   |
+|Prot 2|   100%   |     0%   |
+|Prot 3|     0%   |   100%   |
