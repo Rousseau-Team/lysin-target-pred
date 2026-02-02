@@ -127,6 +127,7 @@ The output corresponds to the consensus of predictions made by the model. The fi
 
 Ex. Predicted gram of each lysin
 |      |gram-pos %|gram-neg %|
+|------|----------|----------|
 |Prot 1|    90%   |    10%   |
 |Prot 2|   100%   |     0%   |
 |Prot 3|     0%   |   100%   |
