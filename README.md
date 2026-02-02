@@ -99,9 +99,9 @@ How to interpret:
 - Prot 3 was predicted by less than 10% of models as being associated to host X. It is unlikely that it is associated to host X (although still possible, the models may be conservative and the training database too limited).
 
 ## Host gram prediction
-An extra module was added if you simply wish to predict the gram of the bacteria your lysins are associated to.
+An extra module was added if you wish to predict the gram of the bacteria your lysins are associated to.
 
-7852 gram-positive lysins (572 clusters) and 7535 gram-neg lysins (522 clusters) are present in the dataset. The dataset contains a large number of examples associated to both classes and is already pretty balanced, so we could envision training only one model. However, to keep the methodology the same as previously, 20% of the dataset is kept at each iteration. Among the retained lysins, a training set composed of 80% of the data and a testing set composed of the remaining 20% is created. These training and testing sets are separated on the basis of "30% sequence identity clusters" as described above.
+7852 gram-positive lysins (572 clusters) and 7535 gram-neg lysins (522 clusters) are present in the dataset. The dataset contains a large number of examples associated to both classes and is already pretty balanced, so we could envision training only one model. However, to keep the same iterative methodology as previously, 20% of the dataset is kept at each iteration. Among the retained lysins, a training set composed of 80% of the data and a testing set composed of the remaining 20% is created. These training and testing sets are separated on the basis of "30% sequence identity clusters" as described above.
 
 Like before, we train multiple models and take the consensus predictions made by all of them. The gram prediction task being much simpler, a lower number of iterations are needed to obtain confident results (most if not all models have a precision >>90%). Models remain fast to train, so feel free to train as many as you want (~100 is far more than sufficient).
 
@@ -122,6 +122,7 @@ Note that you must now specify --pred_gram (not --pred_target) to let the script
 Remember to use the embeddings file as input (and to remove --calc_embeddings --pred_lysins) if these step have already been done.
 
 **Output format**
+
 The output corresponds to the consensus of predictions made by the model. The first column indicates the % of models that predict a lysin as being associated to a gram-positive host and the second indicates the % of models that predict a lysin as being associated to a gram-negative host.
 
 Ex. Predicted gram of each lysin
